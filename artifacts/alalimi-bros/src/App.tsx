@@ -19,7 +19,7 @@ function Home() {
       <section className="welcome-content" aria-label="العليمي اخوان">
         <img
           className="brand-logo"
-          src="/alalimi-bros-logo.png"
+          src="/alalimi-bros-logo-white.png"
           alt="شعار العليمي اخوان"
           fetchPriority="high"
         />
