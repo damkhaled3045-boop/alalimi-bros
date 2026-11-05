@@ -30,11 +30,11 @@ _Populate as you build — non-obvious choices a reader couldn't infer from the 
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+Alalimi Bros sells car parts wholesale and retail. This app is for wholesale customers only.
 
 ## User preferences
 
-- Implement each request exactly as stated; do not add or remove features or content unless the user explicitly asks.
+- Do not implement described features until the user explicitly instructs you to start. Once authorized, follow the requested scope exactly without adding or removing anything on your own.
 
 ## Gotchas
 
