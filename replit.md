@@ -34,7 +34,7 @@ _Describe the high-level user-facing capabilities of this app once they exist._
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Implement each request exactly as stated; do not add or remove features or content unless the user explicitly asks.
 
 ## Gotchas
 

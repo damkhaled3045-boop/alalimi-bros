@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "العليمي اخوان"
+description = "Mobile-first web app shell for العليمي اخوان, beginning with the exact name and logo provided by the user."
+version = "1.0.0"
+id = "artifacts/alalimi-bros"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23736
+
+[services.development]
+run = "pnpm --filter @workspace/alalimi-bros run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/alalimi-bros", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/alalimi-bros/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23736"
+BASE_PATH = "/"
