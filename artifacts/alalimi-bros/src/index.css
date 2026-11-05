@@ -315,7 +315,7 @@
 
 .brand-logo {
   display: block;
-  width: min(78vw, 23rem);
+  width: min(64vw, 17rem);
   height: auto;
   object-fit: contain;
   filter: drop-shadow(0 8px 20px hsl(347 91% 10% / 0.16));
