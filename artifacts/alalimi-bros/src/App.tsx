@@ -1,3 +1,4 @@
+
 import {
   createContext,
   useContext,
@@ -65,8 +66,8 @@ function Home() {
           alt="شعار العليمي اخوان"
           fetchPriority="high"
         />
+
         <button
-          style={{ fontStyle: 'italic', fontWeight: '600', textShadow: '1px 1px 2px rgba(0,0,0,0.2)' }}
           className="continue-button"
           type="button"
           data-testid="button-continue"
@@ -74,8 +75,12 @@ function Home() {
         >
           الموافقة والمتابعة
         </button>
-
       </section>
+
+      <footer className="welcome-footer">
+        <p>© 2026 العليمي إخوان</p>
+        <p>جميع الحقوق محفوظة</p>
+      </footer>
     </main>
   );
 }
@@ -362,8 +367,6 @@ function Dashboard() {
 
 function Router() {
   return (
-    // Keep a shared shell (sidebar, navbar) outside the boundary so it
-    // survives a page crash.
     <RoutedErrorBoundary>
       <Switch>
         <Route path="/" component={Home} />
