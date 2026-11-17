@@ -1,4 +1,22 @@
-import { useState, type FormEvent, type ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useRef,
+  useState,
+  type Dispatch,
+  type FormEvent,
+  type ReactNode,
+  type SetStateAction,
+} from 'react';
+import {
+  Bell,
+  FileText,
+  Home as HomeIcon,
+  Menu,
+  PackagePlus,
+  Search,
+  TrendingUp,
+} from 'lucide-react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
@@ -12,6 +30,27 @@ import {
 } from 'wouter';
 
 const queryClient = new QueryClient();
+
+type CustomerDetails = {
+  accountNumber: string;
+  accountName: string;
+  phoneNumber: string;
+};
+
+type CustomerDetailsContextValue = {
+  customerDetails: CustomerDetails;
+  setCustomerDetails: Dispatch<SetStateAction<CustomerDetails>>;
+};
+
+const CustomerDetailsContext = createContext<CustomerDetailsContextValue | null>(null);
+
+function useCustomerDetails() {
+  const context = useContext(CustomerDetailsContext);
+  if (!context) {
+    throw new Error('CustomerDetailsContext is missing');
+  }
+  return context;
+}
 
 function Home() {
   const [, setLocation] = useLocation();
@@ -42,9 +81,16 @@ function Home() {
 
 function Login() {
   const [, setLocation] = useLocation();
+  const { setCustomerDetails } = useCustomerDetails();
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    setCustomerDetails({
+      accountNumber: String(formData.get('accountNumber') ?? ''),
+      accountName: String(formData.get('accountName') ?? ''),
+      phoneNumber: String(formData.get('phoneNumber') ?? ''),
+    });
     setLocation('/verify');
   }
 
@@ -121,7 +167,6 @@ function Login() {
 function VerifyCode() {
   const [, setLocation] = useLocation();
   const [code, setCode] = useState('');
-  const [notice, setNotice] = useState('');
 
   function handleCodeChange(value: string) {
     const normalized = value
@@ -130,13 +175,12 @@ function VerifyCode() {
       .replace(/\D/g, '')
       .slice(0, 6);
     setCode(normalized);
-    setNotice('');
   }
 
   function handleVerify(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (code.length === 6) {
-      setNotice('سيتم تفعيل التحقق لاحقًا.');
+      setLocation('/dashboard');
     }
   }
 
@@ -195,10 +239,117 @@ function VerifyCode() {
           >
             تحقق
           </button>
-
-          {notice && <p className="login-notice" role="status">{notice}</p>}
         </form>
       </section>
+    </main>
+  );
+}
+
+const dashboardTabs = [
+  { id: 'home', label: 'الرئيسية', Icon: HomeIcon },
+  { id: 'prices', label: 'تحديثات الأسعار', Icon: TrendingUp },
+  { id: 'new-items', label: 'الأصناف الجديدة', Icon: PackagePlus },
+  { id: 'accounts', label: 'حسابات', Icon: FileText },
+  { id: 'notifications', label: 'إشعارات', Icon: Bell },
+] as const;
+
+type DashboardTabId = (typeof dashboardTabs)[number]['id'];
+
+function Dashboard() {
+  const { customerDetails } = useCustomerDetails();
+  const [activeTab, setActiveTab] = useState<DashboardTabId>('home');
+  const [customerDetailsOpen, setCustomerDetailsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const activeTabLabel =
+    dashboardTabs.find((tab) => tab.id === activeTab)?.label ?? 'الرئيسية';
+
+  return (
+    <main className="dashboard-screen" dir="rtl" lang="ar">
+      <div className="dashboard-top">
+        <header className="dashboard-header">
+          <button
+            className="dashboard-menu-button"
+            type="button"
+            aria-label="عرض بيانات العميل"
+            aria-expanded={customerDetailsOpen}
+            aria-controls="customer-details-panel"
+            onClick={() => setCustomerDetailsOpen((open) => !open)}
+          >
+            <Menu size={22} strokeWidth={2} aria-hidden="true" />
+          </button>
+          <img
+            className="dashboard-logo"
+            src="/alalimi-bros-logo-white.png"
+            alt="العليمي اخوان"
+          />
+        </header>
+
+        {customerDetailsOpen && (
+          <section
+            className="customer-details-panel"
+            id="customer-details-panel"
+            aria-label="بيانات العميل"
+          >
+            <h2>بيانات العميل</h2>
+            <dl>
+              <div className="customer-detail-row">
+                <dt>الاسم المرتبط بالحساب الآجل</dt>
+                <dd>{customerDetails.accountName || '—'}</dd>
+              </div>
+              <div className="customer-detail-row">
+                <dt>رقم الحساب</dt>
+                <dd dir="ltr">{customerDetails.accountNumber || '—'}</dd>
+              </div>
+              <div className="customer-detail-row">
+                <dt>رقم الجوال</dt>
+                <dd dir="ltr">{customerDetails.phoneNumber || '—'}</dd>
+              </div>
+            </dl>
+          </section>
+        )}
+      </div>
+
+      <section className="dashboard-main" aria-label={activeTabLabel}>
+        <h1 className="dashboard-page-title">{activeTabLabel}</h1>
+        <form
+          className="dashboard-search"
+          role="search"
+          onSubmit={(event) => event.preventDefault()}
+        >
+          <input
+            ref={searchInputRef}
+            type="search"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.currentTarget.value)}
+            placeholder="بحث"
+            aria-label="بحث"
+          />
+          <button
+            type="button"
+            aria-label="بدء البحث"
+            onClick={() => searchInputRef.current?.focus()}
+          >
+            <Search size={20} strokeWidth={2} aria-hidden="true" />
+          </button>
+        </form>
+      </section>
+
+      <nav className="dashboard-bottom-nav" aria-label="التنقل الرئيسي">
+        {dashboardTabs.map(({ id, label, Icon }) => (
+          <button
+            className={`dashboard-nav-item${activeTab === id ? ' is-active' : ''}`}
+            type="button"
+            key={id}
+            aria-current={activeTab === id ? 'page' : undefined}
+            onClick={() => setActiveTab(id)}
+          >
+            <Icon size={19} strokeWidth={1.9} aria-hidden="true" />
+            <span>{label}</span>
+          </button>
+        ))}
+      </nav>
     </main>
   );
 }
@@ -212,6 +363,7 @@ function Router() {
         <Route path="/" component={Home} />
         <Route path="/login" component={Login} />
         <Route path="/verify" component={VerifyCode} />
+        <Route path="/dashboard" component={Dashboard} />
         <Route component={NotFound} />
       </Switch>
     </RoutedErrorBoundary>
@@ -224,15 +376,23 @@ function RoutedErrorBoundary({ children }: { children: ReactNode }) {
 }
 
 function App() {
+  const [customerDetails, setCustomerDetails] = useState<CustomerDetails>({
+    accountNumber: '',
+    accountName: '',
+    phoneNumber: '',
+  });
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
-          <Router />
-        </WouterRouter>
-        <Toaster />
-      </TooltipProvider>
-    </QueryClientProvider>
+    <CustomerDetailsContext.Provider value={{ customerDetails, setCustomerDetails }}>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+            <Router />
+          </WouterRouter>
+          <Toaster />
+        </TooltipProvider>
+      </QueryClientProvider>
+    </CustomerDetailsContext.Provider>
   );
 }
 
