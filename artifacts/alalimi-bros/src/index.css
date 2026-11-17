@@ -469,6 +469,55 @@
   outline: 3px solid hsl(351 85% 44% / 0.16);
 }
 
+.verification-helper {
+  margin: -0.35rem 0 0;
+  color: #666c83;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.verification-entry {
+  position: relative;
+  width: 100%;
+}
+
+.verification-cells {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.verification-cell {
+  min-width: 0;
+  min-height: 3.35rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid #d7d9e2;
+  border-radius: 0.6rem;
+  background: #fbfbfc;
+  color: #1d244e;
+  font-size: 1.35rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.verification-entry:focus-within .verification-cell {
+  border-color: #c80e2c;
+  box-shadow: 0 0 0 3px hsl(351 85% 44% / 0.12);
+}
+
+.verification-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  opacity: 0.01;
+  cursor: text;
+}
+
 .login-submit {
   width: 100%;
   min-height: 3.25rem;
@@ -495,6 +544,11 @@
 .login-submit:focus-visible {
   outline: 3px solid hsl(351 85% 44% / 0.3);
   outline-offset: 3px;
+}
+
+.login-submit:disabled {
+  background: #c4c5cc;
+  cursor: not-allowed;
 }
 
 .login-notice {
