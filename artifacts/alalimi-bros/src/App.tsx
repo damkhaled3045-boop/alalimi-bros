@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/error-boundary';
+import PriceUpdates from './components/price-updates';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
@@ -257,7 +258,11 @@ type DashboardTabId = (typeof dashboardTabs)[number]['id'];
 
 function Dashboard() {
   const { customerDetails } = useCustomerDetails();
-  const [activeTab, setActiveTab] = useState<DashboardTabId>('home');
+  const [activeTab, setActiveTab] = useState<DashboardTabId>(() =>
+    new URLSearchParams(window.location.search).get('tab') === 'prices'
+      ? 'prices'
+      : 'home',
+  );
   const [customerDetailsOpen, setCustomerDetailsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -334,6 +339,7 @@ function Dashboard() {
             <Search size={20} strokeWidth={2} aria-hidden="true" />
           </button>
         </form>
+        {activeTab === 'prices' && <PriceUpdates />}
       </section>
 
       <nav className="dashboard-bottom-nav" aria-label="التنقل الرئيسي">
